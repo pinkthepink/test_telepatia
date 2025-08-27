@@ -27,7 +27,7 @@ A full-stack web application that processes audio and text inputs to extract med
 The application implements a **3-stage LangGraph workflow**:
 
 1. **Audio Transcription Node**
-   - Accepts audio file URLs
+   - Accepts audio file URLs and file uploads
    - Downloads and transcribes using OpenAI Whisper
    - Passes transcribed text to next stage
 
@@ -53,8 +53,8 @@ The application implements a **3-stage LangGraph workflow**:
 
 ### 1. Clone and Setup
 ```bash
-git clone <repository-url>
-cd teste_telepatia
+git clone https://github.com/pinkthepink/test_telepatia.git
+cd test_telepatia
 ```
 
 ### 2. Configure Environment
@@ -77,61 +77,19 @@ docker-compose up --build -d
 docker-compose up --build
 ```
 
-#### Development Mode (For development)
-```bash
-# Run in development mode with hot reload
-docker-compose -f docker-compose.dev.yml up --build -d
-```
-
 ### 4. Access the Application
 - **Frontend**: http://localhost:3000
 - **Backend API**: http://localhost:8000
 - **API Documentation**: http://localhost:8000/docs
 
-## 🏭 Production vs Development
-
-### Production Mode Features
-- **Optimized React Build**: Minified, compressed assets
-- **Nginx Serving**: Fast static file serving with gzip compression
-- **Multi-stage Docker**: Smaller production images
-- **Security Headers**: XSS protection, content type validation
-- **Health Checks**: Container health monitoring
-
-### Development Mode Features
-- **Hot Reload**: Automatic refresh on code changes
-- **Source Maps**: Better debugging experience
-- **Volume Mounting**: Real-time code synchronization
-- **Development Server**: React development server with better error messages
-
-## 🔧 Manual Setup (Development)
-
-### Backend Setup
-```bash
-cd backend
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-pip install -r requirements.txt
-
-# Set environment variable
-export OPENAI_API_KEY=your_api_key_here
-
-# Run the server
-uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
-```
-
-### Frontend Setup
-```bash
-cd frontend
-npm install
-npm start
-```
-
 ## 📝 Usage Guide
 
 ### Audio Processing
 1. Select the "Audio Input" tab
-2. Paste a direct URL to an audio file (MP3, WAV, M4A, etc.)
-3. Click "Process Audio"
+2. Choose between:
+   - **Audio URL**: Paste a direct URL to an audio file
+   - **File Upload**: Upload an audio file directly (MP3, WAV, M4A, etc.)
+3. Click "Process Audio" or "Upload & Process"
 4. View the transcription and medical analysis results
 
 ### Text Processing
@@ -139,11 +97,6 @@ npm start
 2. Enter medical text (symptoms, consultation notes, etc.)
 3. Click "Process Text"
 4. View the extracted information and diagnosis
-
-### Example Audio URLs for Testing
-```
-https://www.soundjay.com/misc/sounds/bell-ringing-05.wav
-```
 
 ### Example Text Input
 ```
@@ -156,6 +109,7 @@ in family. Seeking consultation for persistent symptoms.
 
 ### Main Endpoints
 - `POST /process` - Process audio URL or text
+- `POST /process/upload` - Process uploaded audio file
 - `GET /health` - Health check
 - `GET /metrics` - Performance metrics
 - `GET /workflow/status` - Workflow information
@@ -183,10 +137,11 @@ curl -X POST "http://localhost:8000/process" \
 ## 🏗️ Project Structure
 
 ```
-teste_telepatia/
+test_telepatia/
 ├── docker-compose.yml          # Docker orchestration
-├── .env                        # Environment variables
+├── .env.example               # Environment template
 ├── README.md                   # This file
+├── SETUP.md                   # Detailed setup guide
 │
 ├── backend/                    # Python FastAPI backend
 │   ├── Dockerfile
@@ -198,11 +153,8 @@ teste_telepatia/
 │       │   ├── workflow.py    # Workflow definition
 │       │   └── schemas.py     # Data models
 │       ├── middleware/        # Request/response middleware
-│       │   ├── validation.py  # Input validation
-│       │   ├── error_handler.py # Error handling
-│       │   └── metrics.py     # Performance tracking
-│       └── utils/
-│           └── audio_downloader.py # Audio file handling
+│       ├── config/           # Configuration files
+│       └── utils/            # Utility functions
 │
 └── frontend/                   # React frontend
     ├── Dockerfile
@@ -213,7 +165,7 @@ teste_telepatia/
         │   ├── AudioInput.jsx
         │   ├── TextInput.jsx
         │   ├── ResultsDisplay.jsx
-        │   └── LoadingIndicator.jsx
+        │   └── ProcessingOverlay.jsx
         └── services/
             └── api.js         # API client
 ```
@@ -228,24 +180,31 @@ OPENAI_API_KEY=your_openai_api_key_here
 # Optional
 BACKEND_PORT=8000
 FRONTEND_PORT=3000
+
+# Langfuse (for observability)
+LANGFUSE_SECRET_KEY=your_langfuse_secret_key
+LANGFUSE_PUBLIC_KEY=your_langfuse_public_key
+LANGFUSE_HOST=https://us.cloud.langfuse.com
 ```
 
 ### Supported Audio Formats
 - MP3, WAV, M4A, AAC, OGG, FLAC
-- Direct URLs only (no file uploads)
-- Maximum processing time: 60 seconds
+- Both direct URLs and file uploads supported
+- Maximum file size: 25MB
+- Maximum processing time: 180 seconds
 
 ## 🛡️ Security & Validation
 
 ### Backend Security Features
 - Request validation middleware
 - Input sanitization
-- Rate limiting ready
+- File type and size validation
 - Error handling without sensitive data exposure
 - CORS configuration for frontend integration
 
 ### Input Validation
 - Audio URL format validation
+- File type and size validation (25MB limit)
 - Text length limits (10-10,000 characters)
 - Malicious content filtering
 - Request size limits
@@ -259,10 +218,10 @@ FRONTEND_PORT=3000
 - Error rates and types
 - Workflow performance
 
-### Health Checks
-- Backend API health: `GET /health`
-- OpenAI API connectivity
-- Workflow status validation
+### Observability
+- **Langfuse Integration**: Full tracing of AI interactions
+- Health checks and status endpoints
+- Comprehensive logging and error tracking
 
 ## 🐛 Troubleshooting
 
@@ -280,10 +239,10 @@ docker-compose logs backend
 docker-compose restart
 ```
 
-**"Invalid audio URL format"**
-- Ensure URL is publicly accessible
-- Check that URL points to an actual audio file
-- Verify supported audio format
+**File Upload Issues**
+- Ensure file is under 25MB
+- Check supported audio formats (MP3, WAV, M4A, AAC, OGG, FLAC)
+- Verify backend has sufficient disk space for temporary files
 
 **OpenAI API Errors**
 - Verify API key is correctly set in `.env`
@@ -298,45 +257,6 @@ docker-compose up --build
 # View real-time logs
 docker-compose logs -f backend
 docker-compose logs -f frontend
-```
-
-## 🎯 Design Decisions
-
-### LangGraph Implementation
-- **Modular Nodes**: Each processing stage is an independent node
-- **State Management**: Shared state across workflow stages
-- **Error Handling**: Node-level and workflow-level error recovery
-- **Async Processing**: Non-blocking audio downloads and API calls
-
-### Frontend Architecture
-- **Material-UI**: Consistent, professional medical UI
-- **Tab-based Input**: Clear separation between audio and text input
-- **Real-time Status**: Processing indicators and health monitoring
-- **Responsive Design**: Works on desktop and mobile devices
-
-### API Design
-- **RESTful Endpoints**: Standard HTTP methods and status codes
-- **Structured Responses**: Consistent JSON format with error details
-- **Comprehensive Validation**: Input validation with clear error messages
-- **Performance Monitoring**: Built-in metrics and logging
-
-## 🔬 Medical Information Processing
-
-### Extracted Data Structure
-```json
-{
-  "symptoms": ["headache", "nausea", "sensitivity to light"],
-  "patient_info": {
-    "name": "John Smith",
-    "age": 45,
-    "identification_number": "12345",
-    "gender": "male"
-  },
-  "consultation_reason": "Persistent headache symptoms",
-  "diagnosis": "Possible migraine based on symptoms...",
-  "treatment_plan": "Rest, hydration, pain medication...",
-  "recommendations": "Follow up if symptoms persist..."
-}
 ```
 
 ## ⚠️ Important Disclaimers
@@ -359,14 +279,6 @@ docker-compose logs -f frontend
 
 This project is for educational and demonstration purposes.
 
-## 🆘 Support
-
-For technical issues:
-1. Check the troubleshooting section
-2. Review application logs
-3. Verify configuration settings
-4. Check OpenAI API status
-
 ## 🔗 External Dependencies
 
 - **OpenAI API**: GPT-4 and Whisper models
@@ -375,3 +287,4 @@ For technical issues:
 - **React**: Frontend framework
 - **Material-UI**: UI component library
 - **Docker**: Containerization
+- **Langfuse**: LLM observability platform

@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__docs-mcp-server__search_docs",
+      "mcp__docs-mcp-server__list_libraries",
+      "Bash(docker-compose up:*)",
+      "Bash(docker logs:*)",
+      "Bash(curl:*)",
+      "Bash(docker-compose:*)",
+      "Bash(docker exec:*)",
+      "WebFetch(domain:langfuse.com)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

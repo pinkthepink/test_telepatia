@@ -1,0 +1,106 @@
+# Environment variables
+.env
+.env.local
+.env.production
+.env.development
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# React
+build/
+.DS_Store
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Docker
+.dockerignore
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+logs
+*.log
+
+# Temporary files
+temp/
+tmp/
+*.tmp
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Test files and reports
+test_*.json
+test_*.md
+test_*.txt
+tests/
+coverage/
+.coverage
+.pytest_cache/
+.tox/
+
+# Audio files (if any test files remain)
+*.mp3
+*.wav
+*.m4a
+
+# Development files that were removed
+docker-compose.dev.yml
+Dockerfile.dev
+format_response.py
+setup.bat
+setup.sh
+ENHANCED_FRONTEND_FEATURES.md
+
+# Package manager locks (to avoid version conflicts)
+package-lock.json
+yarn.lock

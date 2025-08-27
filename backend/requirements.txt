@@ -1,0 +1,14 @@
+fastapi
+uvicorn
+langgraph
+langchain
+langchain-openai
+openai
+pydantic
+python-multipart
+requests
+python-dotenv
+aiofiles
+aiohttp
+psutil
+langfuse
